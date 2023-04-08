@@ -1,6 +1,6 @@
 package org.example.neural_network;
 
-import org.example.java_torch.Linear;
+import org.example.entity.torch.Linear;
 
 public class LogisticRegression implements Module {
 

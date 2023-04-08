@@ -1,4 +1,4 @@
-package org.example.java_torch;
+package org.example.entity.torch;
 
 public class Linear {
 
