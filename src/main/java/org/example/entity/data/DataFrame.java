@@ -4,8 +4,8 @@ import java.util.List;
 
 public class DataFrame {
 
-    private String[] columnNames;
     private final List<int[]> df;
+    private String[] columnNames;
 
     public DataFrame(List<int[]> df) {
         this.df = df;
@@ -19,5 +19,5 @@ public class DataFrame {
         }
         throw new IllegalStateException("Index is invalid."); // FIXME create custom exception here
     }
-    
+
 }

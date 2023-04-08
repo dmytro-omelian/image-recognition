@@ -28,7 +28,7 @@ public class Dataset {
                 }
                 String[] strPixels = line.split(",");
                 int[] pixels = new int[strPixels.length];
-                for (int i = 1; i < strPixels.length; ++ i) { // FIXME extract method
+                for (int i = 1; i < strPixels.length; ++i) { // FIXME extract method
                     pixels[i - 1] = Integer.parseInt(strPixels[i]);
                 }
                 train.add(pixels);
