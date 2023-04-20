@@ -3,6 +3,8 @@ package org.example;
 import org.example.entity.data.DataLoader;
 import org.example.entity.data.Dataset;
 import org.example.neural_network.LogisticRegression;
+import org.example.optimizer.CrossEntropyLoss;
+import org.example.optimizer.SGD;
 import org.example.preprocessing.PreprocessService;
 
 import java.util.ArrayList;
@@ -15,7 +17,6 @@ public class Main {
         System.out.println(train.headTrainY());
 
         // FIXME features -> it is double values (especially after normalization)
-
 
         var features = train.getFeatures();
         var labels = train.getLabels();
@@ -36,6 +37,28 @@ public class Main {
         int inputDim = 28 * 28;
         int outputDim = 10;
         LogisticRegression model = new LogisticRegression(inputDim, outputDim);
+
+        var error = new CrossEntropyLoss();
+        var optimizer = new SGD();
+
+        int numberOfEpochs = 10; // FIXME
+
+        for (int epoch = 0; epoch < numberOfEpochs; ++ epoch) {
+
+            for (var batch : trainLoader.getBatches()) {
+
+                var images = batch.
+
+                optimizer.zero_grad();
+
+//                var outputs = model.forward();
+
+                var loss = error.calculate(outputs, targets)
+
+                optimizer.step();
+            }
+
+        }
 
         // for each epoch
         // for each batch
