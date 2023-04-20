@@ -10,14 +10,17 @@ import java.util.List;
 public class Dataset {
 
     private final String path;
+    private List<List<Integer>> train;
+    private List<Integer> labels;
 
     public Dataset(String path) {
         this.path = path;
+        this.labels = new ArrayList<>();
     }
 
-    public List<int[]> load() {
+    public List<List<Integer>> load() {
         String line = "";
-        List<int[]> train = new ArrayList<int[]>();
+        var train = new ArrayList<List<Integer>>();
         try {
             boolean labelsSkipped = false;
             BufferedReader br = new BufferedReader(new FileReader(this.path));
@@ -27,18 +30,47 @@ public class Dataset {
                     continue;
                 }
                 String[] strPixels = line.split(",");
-                int[] pixels = new int[strPixels.length];
-                for (int i = 1; i < strPixels.length; ++i) { // FIXME extract method
-                    pixels[i - 1] = Integer.parseInt(strPixels[i]);
+                this.labels.add(Integer.parseInt(strPixels[0]));
+                var pixels = new ArrayList<Integer>();
+                for (int i = 1; i < strPixels.length; ++ i) {
+                    var pixel = Integer.parseInt(strPixels[i]);
+                    pixels.add(pixel);
                 }
                 train.add(pixels);
             }
+            this.train = train;
             return train;
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e); // FIXME handle exceptions in a better way
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public List<List<Integer>> headTrainX() {
+        return headTrainX(5);
+    }
+
+    public List<List<Integer>> headTrainX(int len) {
+        List<List<Integer>> result = new ArrayList<>();
+        for (int i = 0; i < len; ++ i) {
+            var item = this.train.get(i);
+            result.add(item);
+        }
+        return result;
+    }
+
+    public List<Integer> headTrainY() {
+        return headTrainY(5);
+    }
+
+    public List<Integer> headTrainY(int len) {
+        List<Integer> result = new ArrayList<>();
+        for (int i = 0; i < len; ++ i) {
+            var item = this.labels.get(i);
+            result.add(item);
+        }
+        return result;
     }
 
 }
