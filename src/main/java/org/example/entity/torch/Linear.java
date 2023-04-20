@@ -10,4 +10,8 @@ public class Linear {
         this.outputDim = outputDim;
     }
 
+    void calculate(int[][] x) {
+        // TODO something useful
+    }
+
 }
