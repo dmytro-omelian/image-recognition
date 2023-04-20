@@ -9,8 +9,8 @@ public class PreprocessService {
     public PreprocessService() {
     }
 
-    public static void trainTestSplit(List<List<Integer>> X, List<Integer> y, double testSize) {
-        trainTestSplit(X, y, testSize, true, 42);
+    public static TrainTestEntity trainTestSplit(List<List<Integer>> X, List<Integer> y, double testSize) {
+        return trainTestSplit(X, y, testSize, true, 42);
     }
 
     public static TrainTestEntity trainTestSplit(List<List<Integer>> X, List<Integer> y, double testSize, boolean shuffle, int randomState) {
@@ -53,7 +53,7 @@ public class PreprocessService {
         );
     }
 
-    static class TrainTestEntity {
+    public static class TrainTestEntity {
 
         private final List<List<Integer>> trainX;
         private final List<Integer> trainY;

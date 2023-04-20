@@ -10,7 +10,7 @@ import java.util.List;
 public class Dataset {
 
     private final String path;
-    private List<List<Integer>> train;
+    private List<List<Integer>> features;
     private List<Integer> labels;
 
     public Dataset(String path) {
@@ -38,7 +38,7 @@ public class Dataset {
                 }
                 train.add(pixels);
             }
-            this.train = train;
+            this.features = train;
             return train;
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e); // FIXME handle exceptions in a better way
@@ -54,7 +54,7 @@ public class Dataset {
     public List<List<Integer>> headTrainX(int len) {
         List<List<Integer>> result = new ArrayList<>();
         for (int i = 0; i < len; ++ i) {
-            var item = this.train.get(i);
+            var item = this.features.get(i);
             result.add(item);
         }
         return result;
@@ -73,4 +73,25 @@ public class Dataset {
         return result;
     }
 
+    public List<List<Integer>> getFeatures() {
+        return features;
+    }
+
+    public List<Integer> getLabels() {
+        return labels;
+    }
+
+    public List<List<Double>> getNormalizedFeatures() { // FIXME rewrite with streams
+        int n = this.features.size();
+        List<List<Double>> result = new ArrayList<>();
+        for (List<Integer> feature : this.features) {
+            List<Double> temp = new ArrayList<>();
+            for (var item : feature) {
+                double value = 1.0 * item / 255;
+                temp.add(value);
+            }
+            result.add(temp);
+        }
+        return result;
+    }
 }
