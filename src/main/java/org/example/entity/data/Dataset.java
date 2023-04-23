@@ -11,7 +11,7 @@ public class Dataset {
 
     private final String path;
     private List<List<Integer>> features;
-    private List<Integer> labels;
+    private final List<Integer> labels;
 
     public Dataset(String path) {
         this.path = path;
@@ -32,7 +32,7 @@ public class Dataset {
                 String[] strPixels = line.split(",");
                 this.labels.add(Integer.parseInt(strPixels[0]));
                 var pixels = new ArrayList<Integer>();
-                for (int i = 1; i < strPixels.length; ++ i) {
+                for (int i = 1; i < strPixels.length; ++i) {
                     var pixel = Integer.parseInt(strPixels[i]);
                     pixels.add(pixel);
                 }
@@ -53,7 +53,7 @@ public class Dataset {
 
     public List<List<Integer>> headTrainX(int len) {
         List<List<Integer>> result = new ArrayList<>();
-        for (int i = 0; i < len; ++ i) {
+        for (int i = 0; i < len; ++i) {
             var item = this.features.get(i);
             result.add(item);
         }
@@ -66,7 +66,7 @@ public class Dataset {
 
     public List<Integer> headTrainY(int len) {
         List<Integer> result = new ArrayList<>();
-        for (int i = 0; i < len; ++ i) {
+        for (int i = 0; i < len; ++i) {
             var item = this.labels.get(i);
             result.add(item);
         }
@@ -83,7 +83,7 @@ public class Dataset {
 
     public List<List<Double>> getNormalizedFeatures() {
         return this.features.stream().map(featureList ->
-                featureList.stream().map(this::normalizeFeature).toList())
+                        featureList.stream().map(this::normalizeFeature).toList())
                 .toList();
     }
 

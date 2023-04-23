@@ -41,7 +41,7 @@ public class Main {
 
         int numberOfEpochs = 10; // FIXME
 
-        for (int epoch = 0; epoch < numberOfEpochs; ++ epoch) {
+        for (int epoch = 0; epoch < numberOfEpochs; ++epoch) {
 
             for (var batch : trainLoader.getBatches()) {
 

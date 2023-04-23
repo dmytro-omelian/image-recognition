@@ -27,7 +27,7 @@ public class DataLoader {
             int right = Math.min(i + batchSize, this.X.size());
             var images = new ArrayList<List<Integer>>();
             var labels = new ArrayList<Integer>();
-            for (int left = i; left < right; ++ left) {
+            for (int left = i; left < right; ++left) {
                 images.add(this.X.get(left));
                 labels.add(this.y.get(left));
             }

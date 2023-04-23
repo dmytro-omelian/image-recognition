@@ -19,7 +19,7 @@ public class PreprocessService {
         }
         int n = X.size();
         List<Integer> indexes = new ArrayList<>();
-        for (int i = 0; i < n; ++ i) {
+        for (int i = 0; i < n; ++i) {
             indexes.add(i);
         }
         if (shuffle) {
@@ -35,12 +35,12 @@ public class PreprocessService {
         var testY = new ArrayList<Integer>();
 
         int numberOfTestItems = (int) (n * testSize);
-        for (int i = 0; i < numberOfTestItems; ++ i) {
+        for (int i = 0; i < numberOfTestItems; ++i) {
             testX.add(shuffledX.get(i));
             testY.add(shuffledY.get(i));
         }
 
-        for (int i = numberOfTestItems; i < n; ++ i) {
+        for (int i = numberOfTestItems; i < n; ++i) {
             trainX.add(shuffledX.get(i));
             trainY.add(shuffledY.get(i));
         }

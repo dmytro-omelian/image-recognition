@@ -5,8 +5,8 @@ public class Linear {
     private final int inputDim;
     private final int outputDim;
 
-    private Tensor weights;
-    private Tensor bias;
+    private final Tensor weights;
+    private final Tensor bias;
 
     public Linear(int inputDim, int outputDim) {
         this.inputDim = inputDim;

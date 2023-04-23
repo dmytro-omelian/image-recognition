@@ -27,7 +27,7 @@ public class Tensor {
 
     private List<List<Double>> initZeros(int height, int width) {
         List<List<Double>> result = new ArrayList<>();
-        for (int i = 0; i < height; ++ i) {
+        for (int i = 0; i < height; ++i) {
             result.add(new ArrayList<>(Collections.nCopies(width, 0.0)));
         }
         return result;
@@ -35,9 +35,9 @@ public class Tensor {
 
     private List<List<Double>> randInit(int height, int width) {
         var result = new ArrayList<List<Double>>();
-        for (int i = 0; i < height; ++ i) {
+        for (int i = 0; i < height; ++i) {
             var temp = new ArrayList<Double>();
-            for (int j = 0; j < width; ++ j) {
+            for (int j = 0; j < width; ++j) {
                 var value = random.nextDouble();
                 temp.add(value);
             }
