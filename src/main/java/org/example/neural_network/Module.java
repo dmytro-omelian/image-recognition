@@ -1,7 +1,9 @@
 package org.example.neural_network;
 
+import java.util.List;
+
 public interface Module {
 
-    void forward();
+    List<List<Double>> forward(List<List<Double>> X);
 
 }
