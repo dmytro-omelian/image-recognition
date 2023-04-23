@@ -81,17 +81,13 @@ public class Dataset {
         return labels;
     }
 
-    public List<List<Double>> getNormalizedFeatures() { // FIXME rewrite with streams
-        int n = this.features.size();
-        List<List<Double>> result = new ArrayList<>();
-        for (List<Integer> feature : this.features) {
-            List<Double> temp = new ArrayList<>();
-            for (var item : feature) {
-                double value = 1.0 * item / 255;
-                temp.add(value);
-            }
-            result.add(temp);
-        }
-        return result;
+    public List<List<Double>> getNormalizedFeatures() {
+        return this.features.stream().map(featureList ->
+                featureList.stream().map(this::normalizeFeature).toList())
+                .toList();
+    }
+
+    private Double normalizeFeature(int feature) {
+        return 1.0 * feature / 255;
     }
 }

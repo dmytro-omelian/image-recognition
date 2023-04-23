@@ -7,8 +7,6 @@ import org.example.optimizer.CrossEntropyLoss;
 import org.example.optimizer.SGD;
 import org.example.preprocessing.PreprocessService;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
@@ -18,7 +16,7 @@ public class Main {
 
         // FIXME features -> it is double values (especially after normalization)
 
-        var features = train.getFeatures();
+        var features = train.getNormalizedFeatures();
         var labels = train.getLabels();
 
         PreprocessService.TrainTestEntity trainTestEntity = PreprocessService.trainTestSplit(
@@ -47,15 +45,15 @@ public class Main {
 
             for (var batch : trainLoader.getBatches()) {
 
-                var images = batch.
+//                var images = batch.
 
-                optimizer.zero_grad();
+//                optimizer.zero_grad();
 
 //                var outputs = model.forward();
 
-                var loss = error.calculate(outputs, targets)
+//                var loss = error.calculate(outputs, targets)
 
-                optimizer.step();
+//                optimizer.step();
             }
 
         }
