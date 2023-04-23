@@ -28,6 +28,6 @@ public class Linear {
     }
 
     public Tensor multiply(Tensor a, Tensor b) {
-        return null;
+        return a.multiply(b);
     }
 }

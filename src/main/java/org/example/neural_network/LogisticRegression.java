@@ -3,8 +3,6 @@ package org.example.neural_network;
 import org.example.entity.torch.Linear;
 import org.example.entity.torch.Tensor;
 
-import java.util.List;
-
 public class LogisticRegression implements Module {
 
     private final int inputDim; // 28 * 28 - size of images
@@ -18,8 +16,8 @@ public class LogisticRegression implements Module {
     }
 
     @Override
-    public List<List<Double>> forward(List<List<Double>> X) {
-        return (List<List<Double>>) linear.forward(new Tensor(X));
+    public Tensor forward(Tensor X) {
+        return linear.forward(X);
     }
 
 }

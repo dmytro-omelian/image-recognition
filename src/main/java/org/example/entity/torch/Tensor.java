@@ -52,12 +52,19 @@ public class Tensor {
         return new Shape(height, width);
     }
 
-
+    /***
+     *
+     * @return tensor
+     */
     public Tensor T() {
         return null;
     }
 
     public void add(Tensor bias) {
 
+    }
+
+    public Tensor multiply(Tensor b) {
+        return null;
     }
 }

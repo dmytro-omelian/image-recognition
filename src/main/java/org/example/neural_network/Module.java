@@ -1,9 +1,9 @@
 package org.example.neural_network;
 
-import java.util.List;
+import org.example.entity.torch.Tensor;
 
 public interface Module {
 
-    List<List<Double>> forward(List<List<Double>> X);
+    Tensor forward(Tensor X);
 
 }

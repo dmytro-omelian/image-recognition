@@ -1,6 +1,6 @@
 package org.example.neural_network;
 
-import java.util.List;
+import org.example.entity.torch.Tensor;
 
 public class CNNModel implements Module {
 
@@ -9,9 +9,9 @@ public class CNNModel implements Module {
     }
 
     @Override
-    public List<List<Double>> forward(/*
+    public Tensor forward(/*
         X - but what values?
-    */List<List<Double>> X) {
+    */Tensor X) {
         return null;
     }
 }
