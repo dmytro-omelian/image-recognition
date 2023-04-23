@@ -1,6 +1,9 @@
 package org.example.neural_network;
 
 import org.example.entity.torch.Linear;
+import org.example.entity.torch.Tensor;
+
+import java.util.List;
 
 public class LogisticRegression implements Module {
 
@@ -15,9 +18,8 @@ public class LogisticRegression implements Module {
     }
 
     @Override
-    public void forward(/*int[][] x*/) {
-        // linear.calculate(/*   x    */);
-        // return out
+    public List<List<Double>> forward(List<List<Double>> X) {
+        return (List<List<Double>>) linear.forward(new Tensor(X));
     }
 
 }

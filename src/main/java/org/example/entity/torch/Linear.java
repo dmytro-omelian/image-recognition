@@ -16,7 +16,7 @@ public class Linear {
         this.bias = new Tensor(outputDim, 1, true);
     }
 
-    Tensor forward(Tensor input) {
+    public Tensor forward(Tensor input) {
         Shape shape = input.getShape();
         if (shape.getWidth() != inputDim) {
             throw new RuntimeException("error...");
