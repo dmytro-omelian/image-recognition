@@ -6,4 +6,5 @@ public interface Module {
 
     Tensor forward(Tensor X);
 
+    Tensor forward(double[][] input);
 }
