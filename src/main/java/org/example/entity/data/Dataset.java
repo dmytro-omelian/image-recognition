@@ -10,7 +10,7 @@ import java.util.List;
 public class Dataset {
 
     private final String path;
-    private List<List<Integer>> features;
+    private List<List<Double>> features;
     private final List<Integer> labels;
 
     public Dataset(String path) {
@@ -18,9 +18,9 @@ public class Dataset {
         this.labels = new ArrayList<>();
     }
 
-    public List<List<Integer>> load() {
+    public List<List<Double>> load() {
         String line = "";
-        var train = new ArrayList<List<Integer>>();
+        var train = new ArrayList<List<Double>>();
         try {
             boolean labelsSkipped = false;
             BufferedReader br = new BufferedReader(new FileReader(this.path));
@@ -31,9 +31,9 @@ public class Dataset {
                 }
                 String[] strPixels = line.split(",");
                 this.labels.add(Integer.parseInt(strPixels[0]));
-                var pixels = new ArrayList<Integer>();
+                var pixels = new ArrayList<Double>();
                 for (int i = 1; i < strPixels.length; ++i) {
-                    var pixel = Integer.parseInt(strPixels[i]);
+                    var pixel = Double.parseDouble(strPixels[i]);
                     pixels.add(pixel);
                 }
                 train.add(pixels);
@@ -47,12 +47,12 @@ public class Dataset {
         }
     }
 
-    public List<List<Integer>> headTrainX() {
+    public List<List<Double>> headTrainX() {
         return headTrainX(5);
     }
 
-    public List<List<Integer>> headTrainX(int len) {
-        List<List<Integer>> result = new ArrayList<>();
+    public List<List<Double>> headTrainX(int len) {
+        List<List<Double>> result = new ArrayList<>();
         for (int i = 0; i < len; ++i) {
             var item = this.features.get(i);
             result.add(item);
@@ -73,7 +73,7 @@ public class Dataset {
         return result;
     }
 
-    public List<List<Integer>> getFeatures() {
+    public List<List<Double>> getFeatures() {
         return features;
     }
 
@@ -87,7 +87,7 @@ public class Dataset {
                 .toList();
     }
 
-    private Double normalizeFeature(int feature) {
-        return 1.0 * feature / 255;
+    private Double normalizeFeature(double feature) {
+        return feature / 255;
     }
 }

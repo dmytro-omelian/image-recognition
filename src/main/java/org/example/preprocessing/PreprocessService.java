@@ -9,11 +9,11 @@ public class PreprocessService {
     public PreprocessService() {
     }
 
-    public static TrainTestEntity trainTestSplit(List<List<Integer>> X, List<Integer> y, double testSize) {
+    public static TrainTestEntity trainTestSplit(List<List<Double>> X, List<Integer> y, double testSize) {
         return trainTestSplit(X, y, testSize, true, 42);
     }
 
-    public static TrainTestEntity trainTestSplit(List<List<Integer>> X, List<Integer> y, double testSize, boolean shuffle, int randomState) {
+    public static TrainTestEntity trainTestSplit(List<List<Double>> X, List<Integer> y, double testSize, boolean shuffle, int randomState) {
         if (testSize <= 0 || testSize >= 1) {
             throw new IllegalStateException("Test size is not valid...");
         }
@@ -26,12 +26,12 @@ public class PreprocessService {
             Collections.shuffle(indexes);
         }
 
-        List<List<Integer>> shuffledX = indexes.stream().map(X::get).toList();
+        List<List<Double>> shuffledX = indexes.stream().map(X::get).toList();
         List<Integer> shuffledY = indexes.stream().map(y::get).toList();
 
-        var trainX = new ArrayList<List<Integer>>();
+        var trainX = new ArrayList<List<Double>>();
         var trainY = new ArrayList<Integer>();
-        var testX = new ArrayList<List<Integer>>();
+        var testX = new ArrayList<List<Double>>();
         var testY = new ArrayList<Integer>();
 
         int numberOfTestItems = (int) (n * testSize);
@@ -55,20 +55,20 @@ public class PreprocessService {
 
     public static class TrainTestEntity {
 
-        private final List<List<Integer>> trainX;
+        private final List<List<Double>> trainX;
         private final List<Integer> trainY;
-        private final List<List<Integer>> testX;
+        private final List<List<Double>> testX;
         private final List<Integer> testY;
 
-        public TrainTestEntity(List<List<Integer>> trainX, List<Integer> trainY,
-                               List<List<Integer>> testX, List<Integer> testY) {
+        public TrainTestEntity(List<List<Double>> trainX, List<Integer> trainY,
+                               List<List<Double>> testX, List<Integer> testY) {
             this.trainX = trainX;
             this.trainY = trainY;
             this.testX = testX;
             this.testY = testY;
         }
 
-        public List<List<Integer>> getTrainX() {
+        public List<List<Double>> getTrainX() {
             return trainX;
         }
 
@@ -76,7 +76,7 @@ public class PreprocessService {
             return trainY;
         }
 
-        public List<List<Integer>> getTestX() {
+        public List<List<Double>> getTestX() {
             return testX;
         }
 
