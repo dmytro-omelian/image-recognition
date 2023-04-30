@@ -10,13 +10,8 @@ public class Tensor {
     private final double[][] values;
     private final Random random;
 
-    public Tensor(List<List<Double>> X) {
-        this.values = new double[X.size()][X.get(0).size()];
-        for (int i = 0; i < X.size(); ++ i) {
-            for (int j = 0; j < X.get(0).size(); ++ j) {
-                this.values[i][j] = X.get(i).get(j);
-            }
-        }
+    public Tensor(double[][] values) {
+        this.values = values;
         this.random = new Random();
     }
 
@@ -27,11 +22,6 @@ public class Tensor {
             this.values = initZeros(height, width);
         }
 
-        this.random = new Random();
-    }
-
-    public Tensor(double[][] values) {
-        this.values = values;
         this.random = new Random();
     }
 
@@ -101,7 +91,7 @@ public class Tensor {
         }
     }
 
-    private double[][] getTensorValues() {
+    public double[][] getTensorValues() {
         return this.values;
     }
 
