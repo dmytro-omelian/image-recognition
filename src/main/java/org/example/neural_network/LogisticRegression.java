@@ -15,9 +15,9 @@ public class LogisticRegression {
         this.linear = new Linear(inputDim, outputDim);
     }
 
-    public Tensor forward(double[][] input) {
+    public double[][] forward(double[][] input) {
         var output = linear.forward(input);
-        return new Tensor(output);
+        return output;
     }
 
 }
