@@ -3,17 +3,21 @@ package org.example;
 import org.example.entity.data.DataLoader;
 import org.example.entity.data.Dataset;
 import org.example.entity.torch.Linear;
-import org.example.entity.torch.Loss;
+import org.example.evaluation.CrossEntropyLoss;
 import org.example.neural_network.LogisticRegression;
 import org.example.entity.torch.SGD;
 import org.example.preprocessing.PreprocessService;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 
 public class Main {
     public static void main(String[] args) {
         Dataset train = new Dataset("src/main/java/org/example/data/train.csv"); // FIXME add parameter load on start dataset
         train.load();
-        System.out.println(train.headTrainY());
+//        System.out.println(train.headTrainY());
 
         // FIXME features -> it is double values (especially after normalization)
 
@@ -21,7 +25,7 @@ public class Main {
         var labels = train.getLabels();
 
         PreprocessService.TrainTestEntity trainTestEntity = PreprocessService.trainTestSplit(
-                train.getFeatures(), train.getLabels(), 0.2);
+                features, labels, 0.2);
 
         var train_X = trainTestEntity.getTrainX();
         var train_y = trainTestEntity.getTrainY();
@@ -31,69 +35,88 @@ public class Main {
         var trainLoader = new DataLoader(train_X, train_y, 8);
         var testLoader = new DataLoader(test_X, test_y, 8);
 
-        // visualize image
-
         int inputDim = 28 * 28;
         int outputDim = 10;
         LogisticRegression model = new LogisticRegression(inputDim, outputDim);
+        Linear linear = new Linear(inputDim, outputDim);
 
-//        var error = new CrossEntropyLoss();
-//        var optimizer = new SGD();
-//
-//        int numberOfEpochs = 10; // FIXME
-//
-//        for (int epoch = 0; epoch < numberOfEpochs; ++epoch) {
-//
-//            for (var batch : trainLoader.getBatches()) {
-//
-////                var images = batch.
-//
-////                optimizer.zero_grad();
-//
-////                var outputs = model.forward();
-//
-////                var loss = error.calculate(outputs, targets)
-//
-////                optimizer.step();
-//            }
-//
-//        }
-        double[][] input = {{0.1, 0.2, 0.3}, {0.4, 0.5, 0.6}, {0.7, 0.8, 0.9}};
-        double[][] target = {{0.3, 0.5}, {0.7, 0.2}, {0.1, 0.8}};
-
-        Linear linear = new Linear(3, 2);
-
-        Loss loss = new Loss();
+        CrossEntropyLoss error = new CrossEntropyLoss(10);
 
         double learningRate = 0.01;
         SGD optimizer = new SGD(linear, learningRate);
 
-        int numEpochs = 1000;
+        int count = 0;
+        int numEpochs = 10;
         for (int epoch = 1; epoch <= numEpochs; epoch++) {
-            double[][] output = linear.forward(input);
-            double[][] gradOutput = loss.backward(output, target);
-            double[][] gradInput = linear.backward(input, gradOutput, learningRate);
-            optimizer.step();
+            var batches = trainLoader.getBatches();
+            for (int i = 0; i < batches.size(); ++ i) {
+                var trainImages = batches.get(i).getImages();
+                var trainTarget = batches.get(i).getLabels().stream().mapToInt(Integer::intValue).toArray();
 
-            if (epoch % 100 == 0) {
-                double lossValue = loss.forward(output, target);
-                System.out.printf("Epoch %d: Loss = %.4f\n", epoch, lossValue);
+                optimizer.zero_grad();
+
+                var outputs = model.forward(convertToDoubleArray(trainImages));
+
+                var loss = error.forward(outputs, trainTarget);
+
+                error.backward(convertToDoubleArray(trainImages), trainTarget);
+
+                optimizer.step();
+
+                count += 1;
+
+                if (count % 50 == 0) {
+                    var correct = 0;
+                    var total = 0;
+                    var testBatches = testLoader.getBatches();
+                    for (int j = 0; j < testBatches.size(); ++ j) {
+                        var testImages = testBatches.get(j).getImages();
+                        var testLabels = testBatches.get(j).getLabels();
+
+                        var testOutputs = linear.forward(convertToDoubleArray(testImages));
+
+                        var predicted = getPredictions(outputs);
+
+                        total += testLabels.size();
+
+                        for (int k = 0; k < testLabels.size(); ++ k) {
+                            if (Objects.equals(testLabels.get(k), predicted.get(k))) {
+                                correct ++;
+                            }
+                        }
+
+                        double accuracy = 100.0 * correct / total;
+
+                    }
+
+                    if (count % 500 == 0) {
+                        System.out.printf("Epoch: %d Loss: %f\n", epoch, loss);
+//                            System.out.printf("Iteration: {%d}  Accuracy: {%f}\n", count, accuracy);
+                    }
+                }
             }
         }
+    }
 
+    private static List<Integer> getPredictions(double[][] output) {
+        List<Integer> predictions = new ArrayList<>();
+        for (int i = 0; i < output.length; ++ i) {
+            double maxElement = output[i][0];
+            int index = 0;
+            for (int j = 0; j < output[i].length; ++ j) {
+                if (output[i][j] > maxElement) {
+                    maxElement = output[i][j];
+                    index = j;
+                }
+            }
+            predictions.add(index);
+        }
+        return predictions;
+    }
 
-
-        // for each epoch
-        // for each batch
-        // convert train and labels to smth
-        // optimizer.zero_grad()
-        // calculate model outputs // forward propagation
-        // calculate loss with CrossEntropyLoss
-        // loss backward()
-        // optimizer.step()
-        // count += 1
-        // calculate prediction
-        // - print loss
-
+    private static double[][] convertToDoubleArray(List<List<Double>> train_x) {
+        return train_x.stream()
+                .map(l -> l.stream().mapToDouble(Double::doubleValue).toArray())
+                .toArray(double[][]::new);
     }
 }
