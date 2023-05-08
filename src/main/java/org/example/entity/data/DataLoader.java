@@ -31,31 +31,32 @@ public class DataLoader {
                 images.add(this.X.get(left));
                 labels.add(this.y.get(left));
             }
-            var batch = new Batch(images, labels);
+
+            var batch = new Batch(
+                    convertToDoubleArray(images),
+                    convertToIntegerArray(labels)
+            );
             batches.add(batch);
         }
         return batches;
     }
 
-    // FIXME convert to Record
-    // research what is that?
-   public static class Batch {
-
-        private final ArrayList<List<Double>> images;
-        private final List<Integer> labels;
-
-        public Batch(ArrayList<List<Double>> images, List<Integer> labels) {
-            this.images = images;
-            this.labels = labels;
+    private int[] convertToIntegerArray(ArrayList<Integer> labels) {
+        int n = labels.size();
+        int[] result = new int[n];
+        for (int i = 0; i < n; ++ i) {
+            result[i] = labels.get(i);
         }
-
-        public ArrayList<List<Double>> getImages() {
-            return images;
-        }
-
-        public List<Integer> getLabels() {
-            return labels;
-        }
+        return result;
     }
 
+    public record Batch(double[][] images, int[] labels) {
+
+    }
+
+    private static double[][] convertToDoubleArray(List<List<Double>> train_x) {
+        return train_x.stream()
+                .map(l -> l.stream().mapToDouble(Double::doubleValue).toArray())
+                .toArray(double[][]::new);
+    }
 }

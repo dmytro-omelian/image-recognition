@@ -11,13 +11,13 @@ import org.example.preprocessing.PreprocessService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 
 public class Main {
     public static void main(String[] args) {
         Dataset train = new Dataset("src/main/java/org/example/data/train.csv"); // FIXME add parameter load on start dataset
         train.load();
-//        System.out.println(train.headTrainY());
 
         // FIXME features -> it is double values (especially after normalization)
 
@@ -37,29 +37,76 @@ public class Main {
 
         int inputDim = 28 * 28;
         int outputDim = 10;
-        LogisticRegression model = new LogisticRegression(inputDim, outputDim);
-        Linear linear = new Linear(inputDim, outputDim);
+//        LogisticRegression model = new LogisticRegression(inputDim, outputDim);
 
         CrossEntropyLoss error = new CrossEntropyLoss(10);
 
         double learningRate = 0.01;
-        SGD optimizer = new SGD(linear, learningRate);
+//        SGD optimizer = new SGD(learningRate);
 
+        Linear linear = new Linear(inputDim, outputDim);
         int count = 0;
         int numEpochs = 10;
         for (int epoch = 1; epoch <= numEpochs; epoch++) {
             var batches = trainLoader.getBatches();
             for (int i = 0; i < batches.size(); ++ i) {
-                var trainImages = batches.get(i).getImages();
-                var trainTarget = batches.get(i).getLabels().stream().mapToInt(Integer::intValue).toArray();
+                var trainImages = batches.get(i).images();
+                var trainTarget = batches.get(i).labels();
 
-                optimizer.zero_grad();
-
-                var outputs = model.forward(convertToDoubleArray(trainImages));
+                var outputs = linear.forward(trainImages);
 
                 var loss = error.forward(outputs, trainTarget);
 
-                error.backward(convertToDoubleArray(trainImages), trainTarget);
+                linear.backward(trainImages, outputs, learningRate);
+
+                count += 1;
+
+                if (count % 50 == 0) {
+                    var correct = 0;
+                    var total = 0;
+                    var testBatches = testLoader.getBatches();
+                    for (int j = 0; j < testBatches.size(); ++ j) {
+                        var testImages = testBatches.get(j).images();
+                        var testLabels = testBatches.get(j).labels();
+
+                        var testOutputs = linear.forward(testImages);
+
+                        var predicted = getPredictions(testOutputs);
+
+                        total += testLabels.length;
+
+                        for (int k = 0; k < testLabels.length; ++ k) {
+                            if (Objects.equals(testLabels[k], predicted[k])) {
+                                correct ++;
+                            }
+                        }
+                    }
+
+                    if (count % 1000 == 0) {
+                        double accuracy = 100.0 * correct / total;
+                        System.out.printf("Epoch: %d Loss: %f Accuracy: %f \n", epoch, loss, accuracy);
+                    }
+                }
+            }
+        }
+
+
+        /*
+        int count = 0;
+        int numEpochs = 10;
+        for (int epoch = 1; epoch <= numEpochs; epoch++) {
+            var batches = trainLoader.getBatches();
+            for (int i = 0; i < batches.size(); ++ i) {
+                var trainImages = batches.get(i).images();
+                var trainTarget = batches.get(i).labels();
+
+                optimizer.zero_grad();
+
+                var outputs = model.forward(trainImages);
+
+                var loss = error.forward(outputs, trainTarget);
+
+                error.backward(trainImages, trainTarget);
 
                 optimizer.step();
 
@@ -70,37 +117,36 @@ public class Main {
                     var total = 0;
                     var testBatches = testLoader.getBatches();
                     for (int j = 0; j < testBatches.size(); ++ j) {
-                        var testImages = testBatches.get(j).getImages();
-                        var testLabels = testBatches.get(j).getLabels();
+                        var testImages = testBatches.get(j).images();
+                        var testLabels = testBatches.get(j).labels();
 
-                        var testOutputs = linear.forward(convertToDoubleArray(testImages));
+                        var testOutputs = model.forward(testImages);
 
-                        var predicted = getPredictions(outputs);
+                        var predicted = getPredictions(testOutputs);
 
-                        total += testLabels.size();
+                        total += testLabels.length;
 
-                        for (int k = 0; k < testLabels.size(); ++ k) {
-                            if (Objects.equals(testLabels.get(k), predicted.get(k))) {
+                        for (int k = 0; k < testLabels.length; ++ k) {
+                            if (Objects.equals(testLabels[k], predicted[k])) {
                                 correct ++;
                             }
                         }
-
-                        double accuracy = 100.0 * correct / total;
-
                     }
 
-                    if (count % 500 == 0) {
-                        System.out.printf("Epoch: %d Loss: %f\n", epoch, loss);
-//                            System.out.printf("Iteration: {%d}  Accuracy: {%f}\n", count, accuracy);
+                    if (count % 1000 == 0) {
+                        double accuracy = 100.0 * correct / total;
+                        System.out.printf("Epoch: %d Loss: %f Accuracy: %f \n", epoch, loss, accuracy);
                     }
                 }
             }
         }
+        */
     }
 
-    private static List<Integer> getPredictions(double[][] output) {
-        List<Integer> predictions = new ArrayList<>();
-        for (int i = 0; i < output.length; ++ i) {
+    private static int[] getPredictions(double[][] output) {
+        int n = output.length;
+        int[] predictions = new int[n];
+        for (int i = 0; i < n; ++ i) {
             double maxElement = output[i][0];
             int index = 0;
             for (int j = 0; j < output[i].length; ++ j) {
@@ -109,14 +155,9 @@ public class Main {
                     index = j;
                 }
             }
-            predictions.add(index);
+            predictions[i] = index;
         }
         return predictions;
     }
 
-    private static double[][] convertToDoubleArray(List<List<Double>> train_x) {
-        return train_x.stream()
-                .map(l -> l.stream().mapToDouble(Double::doubleValue).toArray())
-                .toArray(double[][]::new);
-    }
 }
