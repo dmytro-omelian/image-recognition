@@ -5,16 +5,24 @@ import org.example.entity.data.Dataset;
 import org.example.entity.torch.Linear;
 import org.example.evaluation.CrossEntropyLoss;
 import org.example.neural_network.LogisticRegression;
-import org.example.entity.torch.SGD;
 import org.example.preprocessing.PreprocessService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 
 public class Main {
+    public static List<double[]> convertToDoubleArray(List<List<Double>> list) {
+        return list.stream()
+                .map(innerList -> innerList.stream()
+                        .mapToDouble(Double::doubleValue)
+                        .toArray())
+                .collect(Collectors.toList());
+    }
+
     public static void main(String[] args) {
         Dataset train = new Dataset("src/main/java/org/example/data/train.csv"); // FIXME add parameter load on start dataset
         train.load();
@@ -44,51 +52,60 @@ public class Main {
         double learningRate = 0.01;
 //        SGD optimizer = new SGD(learningRate);
 
-        Linear linear = new Linear(inputDim, outputDim);
-        int count = 0;
-        int numEpochs = 10;
-        for (int epoch = 1; epoch <= numEpochs; epoch++) {
-            var batches = trainLoader.getBatches();
-            for (int i = 0; i < batches.size(); ++ i) {
-                var trainImages = batches.get(i).images();
-                var trainTarget = batches.get(i).labels();
+        var X_train = convertToDoubleArray(train_X);
+        var X_test = convertToDoubleArray(test_X);
 
-                var outputs = linear.forward(trainImages);
+        LogisticRegression model = new LogisticRegression(inputDim, learningRate, 10);
+        model.train(X_train, train_y);
 
-                var loss = error.forward(outputs, trainTarget);
+        double result = model.calculateLoss(X_test, test_y);
+        System.out.printf("Loss: {%f}", result);
 
-                linear.backward(trainImages, outputs, learningRate);
-
-                count += 1;
-
-                if (count % 50 == 0) {
-                    var correct = 0;
-                    var total = 0;
-                    var testBatches = testLoader.getBatches();
-                    for (int j = 0; j < testBatches.size(); ++ j) {
-                        var testImages = testBatches.get(j).images();
-                        var testLabels = testBatches.get(j).labels();
-
-                        var testOutputs = linear.forward(testImages);
-
-                        var predicted = getPredictions(testOutputs);
-
-                        total += testLabels.length;
-
-                        for (int k = 0; k < testLabels.length; ++ k) {
-                            if (Objects.equals(testLabels[k], predicted[k])) {
-                                correct ++;
-                            }
-                        }
-                    }
-
-                    if (count % 1000 == 0) {
-                        double accuracy = 100.0 * correct / total;
-                        System.out.printf("Epoch: %d Loss: %f Accuracy: %f \n", epoch, loss, accuracy);
-                    }
-                }
-            }
-        }
+//        Linear linear = new Linear(inputDim, outputDim);
+//        int count = 0;
+//        int numEpochs = 10;
+//        for (int epoch = 1; epoch <= numEpochs; epoch++) {
+//            var batches = trainLoader.getBatches();
+//            for (int i = 0; i < batches.size(); ++ i) {
+//                var trainImages = batches.get(i).images();
+//                var trainTarget = batches.get(i).labels();
+//
+//                var outputs = linear.forward(trainImages);
+//
+//                var loss = error.forward(outputs, trainTarget);
+//
+//                linear.backward(trainImages, outputs, learningRate);
+//
+//                count += 1;
+//
+//                if (count % 50 == 0) {
+//                    var correct = 0;
+//                    var total = 0;
+//                    var testBatches = testLoader.getBatches();
+//                    for (int j = 0; j < testBatches.size(); ++ j) {
+//                        var testImages = testBatches.get(j).images();
+//                        var testLabels = testBatches.get(j).labels();
+//
+//                        var testOutputs = linear.forward(testImages);
+//
+//                        var predicted = getPredictions(testOutputs);
+//
+//                        total += testLabels.length;
+//
+//                        for (int k = 0; k < testLabels.length; ++ k) {
+//                            if (Objects.equals(testLabels[k], predicted[k])) {
+//                                correct ++;
+//                            }
+//                        }
+//                    }
+//
+//                    if (count % 1000 == 0) {
+//                        double accuracy = 100.0 * correct / total;
+//                        System.out.printf("Epoch: %d Loss: %f Accuracy: %f \n", epoch, loss, accuracy);
+//                    }
+//                }
+//            }
+//        }
 
 
         /*
@@ -159,5 +176,22 @@ public class Main {
         }
         return predictions;
     }
+
+
+    public double[] flattenImage(double[][] image) {
+        int numRows = image.length;
+        int numCols = image[0].length;
+        double[] flattened = new double[numRows * numCols];
+
+        int index = 0;
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numCols; j++) {
+                flattened[index++] = image[i][j];
+            }
+        }
+
+        return flattened;
+    }
+
 
 }
