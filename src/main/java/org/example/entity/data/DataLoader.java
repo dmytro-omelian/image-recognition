@@ -5,16 +5,16 @@ import java.util.List;
 
 public class DataLoader {
 
-    private final List<List<Double>> X;
+    private final List<double[]> X;
     private final List<Integer> y;
     private final int batchSize;
     private final boolean shuffle;
 
-    public DataLoader(List<List<Double>> X, List<Integer> y, int batchSize) {
+    public DataLoader(List<double[]> X, List<Integer> y, int batchSize) {
         this(X, y, batchSize, false);
     }
 
-    public DataLoader(List<List<Double>> X, List<Integer> y, int batchSize, boolean shuffle) {
+    public DataLoader(List<double[]> X, List<Integer> y, int batchSize, boolean shuffle) {
         this.X = X;
         this.y = y;
         this.batchSize = batchSize;
@@ -25,7 +25,7 @@ public class DataLoader {
         var batches = new ArrayList<Batch>();
         for (int i = 0; i < this.X.size(); i += batchSize) {
             int right = Math.min(i + batchSize, this.X.size());
-            var images = new ArrayList<List<Double>>();
+            var images = new ArrayList<double[]>();
             var labels = new ArrayList<Integer>();
             for (int left = i; left < right; ++left) {
                 images.add(this.X.get(left));
@@ -54,9 +54,7 @@ public class DataLoader {
 
     }
 
-    private static double[][] convertToDoubleArray(List<List<Double>> train_x) {
-        return train_x.stream()
-                .map(l -> l.stream().mapToDouble(Double::doubleValue).toArray())
-                .toArray(double[][]::new);
+    private static double[][] convertToDoubleArray(List<double[]> train_x) {
+        return train_x.toArray(double[][]::new);
     }
 }
