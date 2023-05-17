@@ -69,6 +69,52 @@ public class LogisticRegression {
                     weights[i][j] -= learningRate * gradients[i][j] / numInstances;
                 }
             }
+
+            //        Linear linear = new Linear(inputDim, outputDim);
+//        int count = 0;
+//        int numEpochs = 10;
+//        for (int epoch = 1; epoch <= numEpochs; epoch++) {
+//            var batches = trainLoader.getBatches();
+//            for (int i = 0; i < batches.size(); ++ i) {
+//                var trainImages = batches.get(i).images();
+//                var trainTarget = batches.get(i).labels();
+//
+//                var outputs = linear.forward(trainImages);
+//
+//                var loss = error.forward(outputs, trainTarget);
+//
+//                linear.backward(trainImages, outputs, learningRate);
+//
+//                count += 1;
+//
+//                if (count % 50 == 0) {
+//                    var correct = 0;
+//                    var total = 0;
+//                    var testBatches = testLoader.getBatches();
+//                    for (int j = 0; j < testBatches.size(); ++ j) {
+//                        var testImages = testBatches.get(j).images();
+//                        var testLabels = testBatches.get(j).labels();
+//
+//                        var testOutputs = linear.forward(testImages);
+//
+//                        var predicted = getPredictions(testOutputs);
+//
+//                        total += testLabels.length;
+//
+//                        for (int k = 0; k < testLabels.length; ++ k) {
+//                            if (Objects.equals(testLabels[k], predicted[k])) {
+//                                correct ++;
+//                            }
+//                        }
+//                    }
+//
+//                    if (count % 1000 == 0) {
+//                        double accuracy = 100.0 * correct / total;
+//                        System.out.printf("Epoch: %d Loss: %f Accuracy: %f \n", epoch, loss, accuracy);
+//                    }
+//                }
+//            }
+
         }
     }
 
