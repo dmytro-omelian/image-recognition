@@ -1,6 +1,6 @@
 package org.mnist;
 
-import org.mnist.entity.data.Dataset;
+import org.mnist.entity.Dataset;
 import org.mnist.service.FileManagerService;
 import org.mnist.service.ImageVisualizationService;
 import org.mnist.service.TypeConverterService;

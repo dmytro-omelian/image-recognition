@@ -1,4 +1,4 @@
-package org.mnist.entity.data;
+package org.mnist.entity;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,7 +1,7 @@
 package org.mnist.model;
 
 
-import org.mnist.entity.data.DataLoader;
+import org.mnist.entity.DataLoader;
 
 import java.util.Arrays;
 import java.util.List;

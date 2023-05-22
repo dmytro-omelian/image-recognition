@@ -1,8 +1,8 @@
 package org.mnist;
 
-import org.mnist.entity.data.Dataset;
+import org.mnist.entity.Dataset;
 import org.mnist.model.LogisticRegression;
-import org.mnist.preprocessing.PreprocessService;
+import org.mnist.service.PreprocessService;
 import org.mnist.service.FileManagerService;
 import org.mnist.service.TypeConverterService;
 
