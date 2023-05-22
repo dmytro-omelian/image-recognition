@@ -1,4 +1,4 @@
-package org.example.entity.data;
+package org.mnist.entity.data;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;

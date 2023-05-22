@@ -1,4 +1,4 @@
-package org.example.service;
+package org.mnist.service;
 
 public class FileManager {
 

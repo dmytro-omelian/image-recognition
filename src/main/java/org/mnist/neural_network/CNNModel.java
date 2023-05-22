@@ -1,6 +1,6 @@
-package org.example.neural_network;
+package org.mnist.neural_network;
 
-import org.example.entity.torch.Tensor;
+import org.mnist.entity.torch.Tensor;
 
 public class CNNModel {
 

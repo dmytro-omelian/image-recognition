@@ -1,4 +1,4 @@
-package org.example.entity.torch;
+package org.mnist.entity.torch;
 
 import java.util.Random;
 
