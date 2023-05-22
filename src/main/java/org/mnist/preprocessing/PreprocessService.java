@@ -1,4 +1,4 @@
-package org.example.preprocessing;
+package org.mnist.preprocessing;
 
 import java.util.ArrayList;
 import java.util.Collections;

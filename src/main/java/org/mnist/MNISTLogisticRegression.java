@@ -1,8 +1,11 @@
-package org.example;
+package org.mnist;
 
-import org.example.entity.data.Dataset;
-import org.example.preprocessing.PreprocessService;
+import org.mnist.entity.data.Dataset;
+import org.mnist.preprocessing.PreprocessService;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,7 +14,9 @@ public class MNISTLogisticRegression {
     private static final double LEARNING_RATE = 0.01;
     private static final int NUM_EPOCHS = 10;
     private static final int NUM_ITERATIONS = 100;
-    private static final int PRINT_INTERVAL = 3;
+    private static final int PRINT_INTERVAL = 1;
+
+    private static final String WEIGHTS_FILENAME = "weights.txt";
 
     public static List<double[]> convertToDoubleArray(List<List<Double>> list) {
         return list.stream()
@@ -23,7 +28,7 @@ public class MNISTLogisticRegression {
 
     public static void main(String[] args) {
         // Load the MNIST dataset
-        Dataset train = new Dataset("src/main/java/org/example/data/train.csv"); // FIXME add parameter load on start dataset
+        Dataset train = new Dataset("src/main/java/org/mnist/data/train.csv"); // FIXME add parameter load on start dataset
         train.load();
 
         // FIXME features -> it is double values (especially after normalization)
@@ -45,12 +50,12 @@ public class MNISTLogisticRegression {
 
         // Create and train the logistic regression model
         LogisticRegressionMNIST logisticRegression = new LogisticRegressionMNIST(NUM_FEATURES, LEARNING_RATE, NUM_ITERATIONS);
-        for (int iteration = 0; iteration < NUM_EPOCHS; iteration++) {
+        for (int epoch = 0; epoch < NUM_EPOCHS; epoch++) {
             logisticRegression.train(X_train_double, y_train);
 
-            if ((iteration + 1) % PRINT_INTERVAL == 0) {
+            if ((epoch + 1) % PRINT_INTERVAL == 0) {
                 double loss = logisticRegression.calculateLoss(X_train_double, y_train);
-                System.out.println("Iteration: " + (iteration + 1) + ", Loss: " + loss);
+                System.out.println("Iteration: " + (epoch + 1) + ", Loss: " + loss);
             }
         }
 
@@ -69,5 +74,25 @@ public class MNISTLogisticRegression {
 
         double accuracy = (double) numCorrect / numInstances;
         System.out.println("Test Accuracy: " + accuracy);
+
+        saveWeights(logisticRegression.getWeights());
+        System.out.println("Weights were saved successfully!");
     }
+
+    private static void saveWeights(double[][] weights) {
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(WEIGHTS_FILENAME))) {
+            for (double[] row : weights) {
+                for (double value : row) {
+                    writer.write(String.valueOf(value));
+                    writer.write(" ");
+                }
+                writer.newLine();
+            }
+            System.out.println("Array data saved to " + WEIGHTS_FILENAME);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
