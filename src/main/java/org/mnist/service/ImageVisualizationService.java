@@ -1,13 +1,10 @@
-package org.mnist;
+package org.mnist.service;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 
-public class ImageVisualization {
+public class ImageVisualizationService {
 
     public void visualize(double[] pixelValues, int imageSize) {
 

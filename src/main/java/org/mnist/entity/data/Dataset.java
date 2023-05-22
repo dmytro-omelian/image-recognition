@@ -10,15 +10,15 @@ import java.util.List;
 public class Dataset {
 
     private final String path;
-    private List<List<Double>> features;
     private final List<Integer> labels;
+    private List<List<Double>> features;
 
     public Dataset(String path) {
         this.path = path;
         this.labels = new ArrayList<>();
     }
 
-    public List<List<Double>> load() {
+    public void load() {
         String line = "";
         var train = new ArrayList<List<Double>>();
         try {
@@ -39,38 +39,11 @@ public class Dataset {
                 train.add(pixels);
             }
             this.features = train;
-            return train;
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e); // FIXME handle exceptions in a better way
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public List<List<Double>> headTrainX() {
-        return headTrainX(5);
-    }
-
-    public List<List<Double>> headTrainX(int len) {
-        List<List<Double>> result = new ArrayList<>();
-        for (int i = 0; i < len; ++i) {
-            var item = this.features.get(i);
-            result.add(item);
-        }
-        return result;
-    }
-
-    public List<Integer> headTrainY() {
-        return headTrainY(5);
-    }
-
-    public List<Integer> headTrainY(int len) {
-        List<Integer> result = new ArrayList<>();
-        for (int i = 0; i < len; ++i) {
-            var item = this.labels.get(i);
-            result.add(item);
-        }
-        return result;
     }
 
     public List<List<Double>> getFeatures() {

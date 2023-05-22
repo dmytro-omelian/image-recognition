@@ -1,20 +1,19 @@
-package org.mnist;
+package org.mnist.model;
 
 
 import org.mnist.entity.data.DataLoader;
 
 import java.util.Arrays;
 import java.util.List;
-
 import java.util.OptionalDouble;
 import java.util.Random;
 
-public class LogisticRegressionMNIST {
-    private double[][] weights;
-    private double learningRate;
-    private int numIterations;
+public class LogisticRegression {
+    private final double[][] weights;
+    private final double learningRate;
+    private final int numIterations;
 
-    public LogisticRegressionMNIST(int numFeatures, double learningRate, int numIterations) {
+    public LogisticRegression(int numFeatures, double learningRate, int numIterations) {
         this.learningRate = learningRate;
         this.numIterations = numIterations;
 

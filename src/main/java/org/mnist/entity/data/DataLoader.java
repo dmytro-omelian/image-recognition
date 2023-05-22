@@ -21,6 +21,10 @@ public class DataLoader {
         this.shuffle = shuffle;
     }
 
+    private static double[][] convertToDoubleArray(List<double[]> train_x) {
+        return train_x.toArray(double[][]::new);
+    }
+
     public List<Batch> getBatches() {
         var batches = new ArrayList<Batch>();
         for (int i = 0; i < this.X.size(); i += batchSize) {
@@ -44,7 +48,7 @@ public class DataLoader {
     private int[] convertToIntegerArray(ArrayList<Integer> labels) {
         int n = labels.size();
         int[] result = new int[n];
-        for (int i = 0; i < n; ++ i) {
+        for (int i = 0; i < n; ++i) {
             result[i] = labels.get(i);
         }
         return result;
@@ -52,9 +56,5 @@ public class DataLoader {
 
     public record Batch(double[][] images, int[] labels) {
 
-    }
-
-    private static double[][] convertToDoubleArray(List<double[]> train_x) {
-        return train_x.toArray(double[][]::new);
     }
 }

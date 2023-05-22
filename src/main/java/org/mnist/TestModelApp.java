@@ -1,22 +1,18 @@
 package org.mnist;
 
 import org.mnist.entity.data.Dataset;
+import org.mnist.service.FileManagerService;
+import org.mnist.service.ImageVisualizationService;
+import org.mnist.service.TypeConverterService;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.OptionalDouble;
-import java.util.stream.Collectors;
 
-public class Main {
-
-    private static final String WEIGHTS_FILENAME = "weights.txt";
+public class TestModelApp {
 
     public static void main(String[] args) {
-        double[][] weights = readWeights();
+        FileManagerService fileManagerService = new FileManagerService();
+        double[][] weights = fileManagerService.readWeights();
         if (weights == null) {
             throw new RuntimeException("Oooops...");
         }
@@ -25,10 +21,10 @@ public class Main {
         train.load();
 
         var features = train.getFeatures();
-        var X = convertToDoubleArray(features);
+        var X = TypeConverterService.convertToArrayOfDoubleArrays(features);
 
         var testDigit = X[7];
-        ImageVisualization visualization = new ImageVisualization();
+        ImageVisualizationService visualization = new ImageVisualizationService();
         visualization.visualize(testDigit, 28);
 
         int predictedValue = predict(testDigit, weights);
@@ -71,30 +67,6 @@ public class Main {
         return Arrays.stream(scores)
                 .map(score -> Math.exp(score - maxScore) / sum)
                 .toArray();
-    }
-
-
-    private static double[][] readWeights() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(WEIGHTS_FILENAME))) {
-            String line;
-            List<List<Double>> weights = new ArrayList<>();
-            while ((line = reader.readLine()) != null) {
-                List<Double> row;
-                String[] values = line.trim().split("\\s+");
-                row = Arrays.stream(values).map(Double::parseDouble).collect(Collectors.toList());
-                weights.add(row);
-            }
-            return convertToDoubleArray(weights);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static double[][] convertToDoubleArray(List<List<Double>> list) {
-        return list.stream()
-                .map(row -> row.stream().mapToDouble(Double::doubleValue).toArray())
-                .toArray(double[][]::new);
     }
 
 }
