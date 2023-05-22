@@ -1,4 +1,4 @@
-package org.example;
+package org.mnist;
 
 import junit.framework.TestCase;
 import org.apache.wicket.util.tester.WicketTester;
