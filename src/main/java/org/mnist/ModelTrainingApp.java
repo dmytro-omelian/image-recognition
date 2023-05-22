@@ -2,9 +2,7 @@ package org.mnist;
 
 import org.mnist.entity.Dataset;
 import org.mnist.model.LogisticRegression;
-import org.mnist.service.PreprocessService;
-import org.mnist.service.FileManagerService;
-import org.mnist.service.TypeConverterService;
+import org.mnist.service.*;
 
 import java.util.List;
 
@@ -38,12 +36,16 @@ public class ModelTrainingApp {
         List<double[]> X_test_double = TypeConverterService.convertToListOfDoubleArrays(X_test);
 
         // Create and train the logistic regression model
-        LogisticRegression logisticRegression = new LogisticRegression(NUM_FEATURES, LEARNING_RATE, NUM_ITERATIONS);
+        ActivationFunctionService activationFunction = new ActivationFunctionService();
+        LogisticRegression model = new LogisticRegression(NUM_FEATURES, LEARNING_RATE, NUM_ITERATIONS, activationFunction);
+        PredictionService predictionService = new PredictionService(activationFunction);
+        LossService lossService = new LossService(activationFunction);
+
         for (int epoch = 0; epoch < NUM_EPOCHS; epoch++) {
-            logisticRegression.train(X_train_double, y_train);
+            model.train(X_train_double, y_train);
 
             if ((epoch + 1) % PRINT_INTERVAL == 0) {
-                double loss = logisticRegression.calculateLoss(X_train_double, y_train);
+                double loss = lossService.calculateLoss(X_train_double, y_train, model.getWeights());
                 System.out.println("Iteration: " + (epoch + 1) + ", Loss: " + loss);
             }
         }
@@ -55,7 +57,7 @@ public class ModelTrainingApp {
             double[] instance = X_test_double.get(i);
             int label = y_test.get(i);
 
-            int prediction = logisticRegression.predict(instance);
+            int prediction = predictionService.predict(instance, model.getWeights());
             if (prediction == label) {
                 numCorrect++;
             }
@@ -65,7 +67,7 @@ public class ModelTrainingApp {
         System.out.println("Test Accuracy: " + accuracy);
 
         FileManagerService fileManagerService = new FileManagerService();
-        fileManagerService.saveWeights(logisticRegression.getWeights());
+        fileManagerService.saveWeights(model.getWeights());
         System.out.println("Weights were saved successfully!");
     }
 

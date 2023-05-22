@@ -2,10 +2,9 @@ package org.mnist.model;
 
 
 import org.mnist.entity.DataLoader;
+import org.mnist.service.ActivationFunctionService;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.OptionalDouble;
 import java.util.Random;
 
 public class LogisticRegression {
@@ -13,9 +12,12 @@ public class LogisticRegression {
     private final double learningRate;
     private final int numIterations;
 
-    public LogisticRegression(int numFeatures, double learningRate, int numIterations) {
+    private final ActivationFunctionService activationFunction;
+
+    public LogisticRegression(int numFeatures, double learningRate, int numIterations, ActivationFunctionService activationFunction) {
         this.learningRate = learningRate;
         this.numIterations = numIterations;
+        this.activationFunction = activationFunction;
 
         Random random = new Random();
         weights = new double[10][numFeatures];
@@ -55,7 +57,7 @@ public class LogisticRegression {
                     }
 
                     // Calculate probabilities using softmax
-                    double[] probabilities = softmax(scores);
+                    double[] probabilities = activationFunction.softmax(scores);
 
                     // FIXME add parallel algorithm
                     // Calculate the gradients
@@ -79,78 +81,6 @@ public class LogisticRegression {
                 }
             }
         }
-    }
-
-    public int predict(double[] X) {
-        int numFeatures = X.length;
-        double[] scores = new double[10];
-
-        // Calculate scores
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < numFeatures; j++) {
-                scores[i] += weights[i][j] * X[j];
-            }
-        }
-
-        // Calculate probabilities using softmax
-        double[] probabilities = softmax(scores);
-
-        int maxIndex = 0;
-        double maxProbability = probabilities[0];
-
-        // Find the index with the highest probability
-        for (int i = 1; i < 10; i++) {
-            if (probabilities[i] > maxProbability) {
-                maxIndex = i;
-                maxProbability = probabilities[i];
-            }
-        }
-
-        return maxIndex;
-    }
-
-    private double[] softmax(double[] scores) {
-        OptionalDouble value;
-        double maxScore = (value = Arrays.stream(scores).max()).isPresent() ? value.getAsDouble() : 0.0;
-
-        double sum = Arrays.stream(scores)
-                .map(score -> Math.exp(score - maxScore))
-                .sum();
-
-        return Arrays.stream(scores)
-                .map(score -> Math.exp(score - maxScore) / sum)
-                .toArray();
-    }
-
-    public double calculateLoss(List<double[]> X, List<Integer> y) {
-        int numInstances = X.size();
-        int numFeatures = X.get(0).length;
-        double loss = 0.0;
-
-        for (int i = 0; i < numInstances; i++) {
-            double[] instance = X.get(i);
-            int label = y.get(i);
-
-            double[] scores = new double[10];
-
-            // Calculate scores
-            for (int j = 0; j < 10; j++) {
-                for (int k = 0; k < numFeatures; k++) {
-                    scores[j] += weights[j][k] * instance[k];
-                }
-            }
-
-            // Calculate probabilities using softmax
-            double[] probabilities = softmax(scores);
-
-            // Calculate the cross-entropy loss
-            double correctProbability = probabilities[label];
-            loss += -Math.log(correctProbability);
-        }
-
-        loss /= numInstances;
-
-        return loss;
     }
 
 
