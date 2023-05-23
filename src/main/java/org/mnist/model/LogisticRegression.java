@@ -2,7 +2,6 @@ package org.mnist.model;
 
 
 import org.mnist.entity.DataLoader;
-import org.mnist.service.ActivationFunctionService;
 import org.mnist.service.LossService;
 
 import java.util.List;

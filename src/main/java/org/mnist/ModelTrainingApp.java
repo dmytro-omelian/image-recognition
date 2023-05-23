@@ -11,14 +11,13 @@ public class ModelTrainingApp {
     private static final double LEARNING_RATE = 0.01;
     private static final int NUM_EPOCHS = 10;
     private static final int NUM_ITERATIONS = 100;
-    private static final int PRINT_INTERVAL = 2;
+    private static final int PRINT_INTERVAL = 1;
 
     public static void main(String[] args) {
-        // Load the MNIST dataset
+        long start = System.currentTimeMillis();
+
         Dataset train = new Dataset("src/main/java/org/mnist/data/train.csv"); // FIXME add parameter load on start dataset
         train.load();
-
-        // FIXME features -> it is double values (especially after normalization)
 
         var features = train.getNormalizedFeatures();
         var labels = train.getLabels();
@@ -31,11 +30,12 @@ public class ModelTrainingApp {
         var X_test = trainTestEntity.getTestX();
         var y_test = trainTestEntity.getTestY();
 
-        // Convert the dataset to double arrays
         List<double[]> X_train_double = TypeConverterService.convertToListOfDoubleArrays(X_train);
         List<double[]> X_test_double = TypeConverterService.convertToListOfDoubleArrays(X_test);
 
-        // Create and train the logistic regression model
+        long dataLoaded = System.currentTimeMillis();
+        System.out.println("Data was loaded for " + (dataLoaded - start) + " ms");
+
         ActivationFunctionService activationFunction = new ActivationFunctionService();
         LossService lossService = new LossService(activationFunction);
         LogisticRegression model = new LogisticRegression(NUM_FEATURES, LEARNING_RATE, NUM_ITERATIONS, lossService);
@@ -49,6 +49,9 @@ public class ModelTrainingApp {
                 System.out.println("Iteration: " + (epoch + 1) + ", Loss: " + loss);
             }
         }
+
+        long modelTrained = System.currentTimeMillis();
+        System.out.println("Model was trained for " + (modelTrained - dataLoaded) + " ms");
 
         // Evaluate the model on the test dataset
         int numCorrect = 0;
@@ -66,9 +69,15 @@ public class ModelTrainingApp {
         double accuracy = (double) numCorrect / numInstances;
         System.out.println("Test Accuracy: " + accuracy);
 
+        long evaluatedScore = System.currentTimeMillis();
+        System.out.println("Model was evaluated for " + (evaluatedScore - modelTrained) + " ms");
+
         FileManagerService fileManagerService = new FileManagerService();
         fileManagerService.saveWeights(model.getWeights());
         System.out.println("Weights were saved successfully!");
+
+        long end = System.currentTimeMillis();
+        System.out.println("Algorithm has worked for " + (end - start) + " ms");
     }
 
 }
