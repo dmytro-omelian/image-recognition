@@ -55,7 +55,7 @@ public class Dataset {
     }
 
     public List<List<Double>> getNormalizedFeatures() {
-        return this.features.stream().map(featureList ->
+        return this.features.parallelStream().map(featureList ->
                         featureList.stream().map(this::normalizeFeature).toList())
                 .toList();
     }

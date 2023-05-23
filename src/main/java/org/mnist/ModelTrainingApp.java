@@ -37,9 +37,9 @@ public class ModelTrainingApp {
 
         // Create and train the logistic regression model
         ActivationFunctionService activationFunction = new ActivationFunctionService();
-        LogisticRegression model = new LogisticRegression(NUM_FEATURES, LEARNING_RATE, NUM_ITERATIONS, activationFunction);
-        PredictionService predictionService = new PredictionService(activationFunction);
         LossService lossService = new LossService(activationFunction);
+        LogisticRegression model = new LogisticRegression(NUM_FEATURES, LEARNING_RATE, NUM_ITERATIONS, lossService);
+        PredictionService predictionService = new PredictionService(lossService);
 
         for (int epoch = 0; epoch < NUM_EPOCHS; epoch++) {
             model.train(X_train_double, y_train);

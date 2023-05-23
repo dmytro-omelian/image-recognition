@@ -19,17 +19,7 @@ public class LossService {
             double[] instance = X.get(i);
             int label = y.get(i);
 
-            double[] scores = new double[10];
-
-            // Calculate scores
-            for (int j = 0; j < 10; j++) {
-                for (int k = 0; k < numFeatures; k++) {
-                    scores[j] += weights[j][k] * instance[k];
-                }
-            }
-
-            // Calculate probabilities using softmax
-            double[] probabilities = activationFunction.softmax(scores);
+            double[] probabilities = calculateProbs(weights, numFeatures, instance);
 
             // Calculate the cross-entropy loss
             double correctProbability = probabilities[label];
@@ -39,6 +29,18 @@ public class LossService {
         loss /= numInstances;
 
         return loss;
+    }
+
+    public double[] calculateProbs(double[][] weights, int numFeatures, double[] instance) {
+        double[] scores = new double[10];
+
+        for (int j = 0; j < 10; j++) {
+            for (int k = 0; k < numFeatures; k++) {
+                scores[j] += weights[j][k] * instance[k];
+            }
+        }
+
+        return activationFunction.softmax(scores);
     }
 
 

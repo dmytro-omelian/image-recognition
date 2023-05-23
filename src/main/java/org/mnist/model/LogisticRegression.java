@@ -3,6 +3,7 @@ package org.mnist.model;
 
 import org.mnist.entity.DataLoader;
 import org.mnist.service.ActivationFunctionService;
+import org.mnist.service.LossService;
 
 import java.util.List;
 import java.util.Random;
@@ -12,12 +13,12 @@ public class LogisticRegression {
     private final double learningRate;
     private final int numIterations;
 
-    private final ActivationFunctionService activationFunction;
+    private final LossService lossService;
 
-    public LogisticRegression(int numFeatures, double learningRate, int numIterations, ActivationFunctionService activationFunction) {
+    public LogisticRegression(int numFeatures, double learningRate, int numIterations, LossService lossService) {
         this.learningRate = learningRate;
         this.numIterations = numIterations;
-        this.activationFunction = activationFunction;
+        this.lossService = lossService;
 
         Random random = new Random();
         weights = new double[10][numFeatures];
@@ -26,6 +27,10 @@ public class LogisticRegression {
                 weights[i][j] = random.nextDouble();
             }
         }
+    }
+
+    public double[][] getWeights() {
+        return this.weights;
     }
 
     public void train(List<double[]> X, List<Integer> y) {
@@ -47,17 +52,7 @@ public class LogisticRegression {
                     double[] instance = trainImages[i];
                     int label = trainTarget[i];
 
-                    double[] scores = new double[10];
-
-                    // Calculate scores
-                    for (int j = 0; j < 10; j++) {
-                        for (int k = 0; k < numFeatures; k++) {
-                            scores[j] += weights[j][k] * instance[k];
-                        }
-                    }
-
-                    // Calculate probabilities using softmax
-                    double[] probabilities = activationFunction.softmax(scores);
+                    double[] probabilities = lossService.calculateProbs(weights, numFeatures, instance);
 
                     // FIXME add parallel algorithm
                     // Calculate the gradients
@@ -81,10 +76,5 @@ public class LogisticRegression {
                 }
             }
         }
-    }
-
-
-    public double[][] getWeights() {
-        return this.weights;
     }
 }

@@ -11,13 +11,14 @@ public class ActivationFunctionService {
 
     public double[] softmax(double[] scores) {
         OptionalDouble value;
-        double maxScore = (value = Arrays.stream(scores).max()).isPresent() ? value.getAsDouble() : 0.0;
+        double maxScore = (value = Arrays.stream(scores).parallel()
+                .max()).isPresent() ? value.getAsDouble() : 0.0;
 
-        double sum = Arrays.stream(scores)
+        double sum = Arrays.stream(scores).parallel()
                 .map(score -> Math.exp(score - maxScore))
                 .sum();
 
-        return Arrays.stream(scores)
+        return Arrays.stream(scores).parallel()
                 .map(score -> Math.exp(score - maxScore) / sum)
                 .toArray();
     }
