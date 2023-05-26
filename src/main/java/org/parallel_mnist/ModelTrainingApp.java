@@ -44,7 +44,7 @@ public class ModelTrainingApp {
             model.train(X_train_double, y_train);
 
             if ((epoch + 1) % PRINT_INTERVAL == 0) {
-                double loss = lossService.calculateLoss(X_train_double, y_train, model.getWeights());
+                double loss = lossService.calculateLoss(X_train_double, y_train, model.getWeightsObject());
                 System.out.println("Iteration: " + (epoch + 1) + ", Loss: " + loss);
             }
         }
@@ -59,7 +59,7 @@ public class ModelTrainingApp {
             double[] instance = X_test_double.get(i);
             int label = y_test.get(i);
 
-            int prediction = predictionService.predict(instance, model.getWeights());
+            int prediction = predictionService.predict(instance, model.getWeightsObject());
             if (prediction == label) {
                 numCorrect++;
             }

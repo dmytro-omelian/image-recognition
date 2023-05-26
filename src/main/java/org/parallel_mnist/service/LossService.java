@@ -1,5 +1,7 @@
 package org.parallel_mnist.service;
 
+import org.parallel_mnist.entity.Weights;
+
 import java.util.List;
 
 public class LossService {
@@ -10,7 +12,7 @@ public class LossService {
         this.activationFunction = activationFunction;
     }
 
-    public double calculateLoss(List<double[]> X, List<Integer> y, double[][] weights) {
+    public double calculateLoss(List<double[]> X, List<Integer> y, Weights w) {
         int numInstances = X.size();
         int numFeatures = X.get(0).length;
         double loss = 0.0;
@@ -19,7 +21,7 @@ public class LossService {
             double[] instance = X.get(i);
             int label = y.get(i);
 
-            double[] probabilities = calculateProbs(weights, numFeatures, instance);
+            double[] probabilities = calculateProbs(w, numFeatures, instance);
 
             // Calculate the cross-entropy loss
             double correctProbability = probabilities[label];
@@ -31,7 +33,8 @@ public class LossService {
         return loss;
     }
 
-    public double[] calculateProbs(double[][] weights, int numFeatures, double[] instance) {
+    public double[] calculateProbs(Weights w, int numFeatures, double[] instance) {
+        var weights = w.getWeights();
         double[] scores = new double[10];
 
         for (int j = 0; j < 10; j++) {

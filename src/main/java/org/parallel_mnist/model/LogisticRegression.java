@@ -2,13 +2,18 @@ package org.parallel_mnist.model;
 
 
 import org.parallel_mnist.entity.DataLoader;
+import org.parallel_mnist.entity.Weights;
 import org.parallel_mnist.service.LossService;
 
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class LogisticRegression {
-    private final double[][] weights;
+    private final Weights weights;
     private final double learningRate;
     private final int numIterations;
 
@@ -18,17 +23,14 @@ public class LogisticRegression {
         this.learningRate = learningRate;
         this.numIterations = numIterations;
         this.lossService = lossService;
-
-        Random random = new Random();
-        weights = new double[10][numFeatures];
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < numFeatures; j++) {
-                weights[i][j] = random.nextDouble();
-            }
-        }
+        this.weights = new Weights(numFeatures);
     }
 
     public double[][] getWeights() {
+        return this.weights.getWeights();
+    }
+
+    public Weights getWeightsObject() {
         return this.weights;
     }
 
@@ -41,11 +43,12 @@ public class LogisticRegression {
         for (int iteration = 0; iteration < numIterations; iteration++) {
             double[][] gradients = new double[10][numFeatures];
 
-            // FIXME separate instances with batches
+            ExecutorService executorServiceBatches = Executors.newFixedThreadPool(5);
+
             var batches = trainLoader.getBatches();
-            for (int batch = 0; batch < batches.size(); ++batch) {
-                var trainImages = batches.get(batch).images();
-                var trainTarget = batches.get(batch).labels();
+            for (DataLoader.Batch value : batches) {
+                var trainImages = value.images();
+                var trainTarget = value.labels();
 
                 for (int i = 0; i < trainImages.length; i++) {
                     double[] instance = trainImages[i];
@@ -53,27 +56,35 @@ public class LogisticRegression {
 
                     double[] probabilities = lossService.calculateProbs(weights, numFeatures, instance);
 
-                    // FIXME add parallel algorithm
-                    // Calculate the gradients
-                    for (int j = 0; j < 10; j++) {
-                        double gradient = probabilities[j];
-                        if (j == label) {
-                            gradient -= 1.0;
-                        }
 
-                        for (int k = 0; k < numFeatures; k++) {
-                            gradients[j][k] += gradient * instance[k];
+                    ExecutorService executorServiceFeatures = Executors.newFixedThreadPool(5);
+                    try {
+                        for (int j = 0; j < 10; j++) {
+                            int finalJ = j;
+                            executorServiceFeatures.execute(() -> {
+                                double gradient = probabilities[finalJ];
+                                if (finalJ == label) {
+                                    gradient -= 1.0;
+                                }
+
+                                for (int k = 0; k < numFeatures; k++) {
+                                    gradients[finalJ][k] += gradient * instance[k];
+                                }
+                            });
+                        }
+                    } finally {
+                        executorServiceFeatures.shutdown();
+                        try {
+                            executorServiceFeatures.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
                         }
                     }
                 }
-
-                // FIXME can add parallel algorithm
-                for (int i = 0; i < 10; i++) {
-                    for (int j = 0; j < numFeatures; j++) {
-                        weights[i][j] -= learningRate * gradients[i][j] / numInstances;
-                    }
-                }
+                weights.update(gradients, learningRate, numInstances);
             }
+
+            executorServiceBatches.shutdown();
         }
     }
 }
