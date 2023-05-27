@@ -5,12 +5,11 @@ import org.parallel_mnist.entity.DataLoader;
 import org.parallel_mnist.entity.Weights;
 import org.parallel_mnist.service.LossService;
 
+import javax.xml.crypto.Data;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 public class LogisticRegression {
     private final Weights weights;
@@ -40,12 +39,45 @@ public class LogisticRegression {
         int numInstances = X.size();
         int numFeatures = X.get(0).length;
 
+//        int numThreads = Thread.activeCount();
+//        ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
+        Thread[] tasks = new Thread[numIterations];
+
         for (int iteration = 0; iteration < numIterations; iteration++) {
+            IterationTask iterationTask = new IterationTask(trainLoader.getBatches(), numFeatures, numInstances);
+            tasks[iteration] = iterationTask;
+        }
+
+        for (int iteration = 0; iteration < numIterations; iteration++) {
+            tasks[iteration].start();
+        }
+
+        for (int iteration = 0; iteration < numIterations; iteration++) {
+            try {
+                tasks[iteration].join();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    public class IterationTask extends Thread {
+
+        private final List<DataLoader.Batch> batches;
+        private final int numFeatures;
+        private final int numInstances;
+
+        public IterationTask(List<DataLoader.Batch> batches, int numFeatures, int numInstances) {
+            this.batches = batches;
+            this.numFeatures = numFeatures;
+            this.numInstances = numInstances;
+        }
+
+        @Override
+        public void run() {
             double[][] gradients = new double[10][numFeatures];
 
-            ExecutorService executorServiceBatches = Executors.newFixedThreadPool(5);
-
-            var batches = trainLoader.getBatches();
             for (DataLoader.Batch value : batches) {
                 var trainImages = value.images();
                 var trainTarget = value.labels();
@@ -55,36 +87,20 @@ public class LogisticRegression {
                     int label = trainTarget[i];
 
                     double[] probabilities = lossService.calculateProbs(weights, numFeatures, instance);
-
-
-                    ExecutorService executorServiceFeatures = Executors.newFixedThreadPool(5);
-                    try {
-                        for (int j = 0; j < 10; j++) {
-                            int finalJ = j;
-                            executorServiceFeatures.execute(() -> {
-                                double gradient = probabilities[finalJ];
-                                if (finalJ == label) {
-                                    gradient -= 1.0;
-                                }
-
-                                for (int k = 0; k < numFeatures; k++) {
-                                    gradients[finalJ][k] += gradient * instance[k];
-                                }
-                            });
+                    for (int j = 0; j < 10; j++) {
+                        double gradient = probabilities[j];
+                        if (j == label) {
+                            gradient -= 1.0;
                         }
-                    } finally {
-                        executorServiceFeatures.shutdown();
-                        try {
-                            executorServiceFeatures.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-                        } catch (InterruptedException e) {
-                            Thread.currentThread().interrupt();
+
+                        for (int k = 0; k < numFeatures; k++) {
+                            gradients[j][k] += gradient * instance[k];
                         }
                     }
                 }
-                weights.update(gradients, learningRate, numInstances);
             }
-
-            executorServiceBatches.shutdown();
+            weights.update(gradients, learningRate, numInstances);
         }
+
     }
 }

@@ -23,21 +23,15 @@ public class Weights {
         this.weights = weights;
     }
 
-    public void update(double[][] gradients, double learningRate, int numInstances) {
-        lock.lock();
-        try {
-            for (int i = 0; i < 10; i++) {
-                for (int j = 0; j < gradients[i].length; j++) {
-                    weights[i][j] -= learningRate * gradients[i][j] / numInstances;
-                }
+    public synchronized void update(double[][] gradients, double learningRate, int numInstances) {
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < gradients[i].length; j++) {
+                weights[i][j] -= learningRate * gradients[i][j] / numInstances;
             }
-        } finally {
-            lock.unlock();
         }
-
     }
 
-    public double[][] getWeights() {
+    public synchronized double[][] getWeights() {
         return this.weights;
     }
 }

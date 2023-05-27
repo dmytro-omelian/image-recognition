@@ -9,7 +9,7 @@ public class ModelTrainingApp {
     private static final int NUM_FEATURES = 784; // Number of features in each image
     private static final double LEARNING_RATE = 0.01;
     private static final int NUM_EPOCHS = 10;
-    private static final int NUM_ITERATIONS = 100;
+    private static final int NUM_ITERATIONS = 10;
     private static final int PRINT_INTERVAL = 1;
 
     public static void main(String[] args) {
@@ -71,9 +71,9 @@ public class ModelTrainingApp {
         long evaluatedScore = System.currentTimeMillis();
         System.out.println("Model was evaluated for " + (evaluatedScore - modelTrained) + " ms");
 
-        FileManagerService fileManagerService = new FileManagerService();
-        fileManagerService.saveWeights(model.getWeights());
-        System.out.println("Weights were saved successfully!");
+//        FileManagerService fileManagerService = new FileManagerService();
+//        fileManagerService.saveWeights(model.getWeights());
+//        System.out.println("Weights were saved successfully!");
 
         long end = System.currentTimeMillis();
         System.out.println("Algorithm has worked for " + (end - start) + " ms");

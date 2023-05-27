@@ -10,7 +10,7 @@ public class ModelTrainingApp {
     private static final int NUM_FEATURES = 784; // Number of features in each image
     private static final double LEARNING_RATE = 0.01;
     private static final int NUM_EPOCHS = 10;
-    private static final int NUM_ITERATIONS = 100;
+    private static final int NUM_ITERATIONS = 10;
     private static final int PRINT_INTERVAL = 1;
 
     public static void main(String[] args) {
