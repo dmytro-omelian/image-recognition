@@ -53,7 +53,6 @@ public class ModelTrainingApp {
         long modelTrained = System.currentTimeMillis();
         System.out.println("Model was trained for " + (modelTrained - dataLoaded) + " ms");
 
-        // Evaluate the model on the test dataset
         int numCorrect = 0;
         int numInstances = X_test_double.size();
         for (int i = 0; i < numInstances; i++) {

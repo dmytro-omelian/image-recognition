@@ -16,7 +16,7 @@ public class TestModelApp {
             w = new Weights(weights);
         }
 
-        Dataset train = new Dataset("src/main/java/org/mnist/data/train.csv"); // FIXME add parameter load on start dataset
+        Dataset train = new Dataset("src/main/java/org/mnist/data/train.csv");
         train.load();
 
         var features = train.getFeatures();
