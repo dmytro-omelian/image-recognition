@@ -10,7 +10,7 @@ public class ModelTrainingApp {
     private static final int NUM_FEATURES = 784; // Number of features in each image
     private static final double LEARNING_RATE = 0.01;
     private static final int NUM_EPOCHS = 10;
-    private static final int NUM_ITERATIONS = 10;
+    private static final int NUM_ITERATIONS = 100;
     private static final int PRINT_INTERVAL = 1;
 
     public static void main(String[] args) {
@@ -53,20 +53,7 @@ public class ModelTrainingApp {
         long modelTrained = System.currentTimeMillis();
         System.out.println("Model was trained for " + (modelTrained - dataLoaded) + " ms");
 
-        // Evaluate the model on the test dataset
-        int numCorrect = 0;
-        int numInstances = X_test_double.size();
-        for (int i = 0; i < numInstances; i++) {
-            double[] instance = X_test_double.get(i);
-            int label = y_test.get(i);
-
-            int prediction = predictionService.predict(instance, model.getWeights());
-            if (prediction == label) {
-                numCorrect++;
-            }
-        }
-
-        double accuracy = (double) numCorrect / numInstances;
+        double accuracy = getAccuracy(X_test_double, y_test, model, predictionService);
         System.out.println("Test Accuracy: " + accuracy);
 
         long evaluatedScore = System.currentTimeMillis();
@@ -78,6 +65,22 @@ public class ModelTrainingApp {
 
         long end = System.currentTimeMillis();
         System.out.println("Algorithm has worked for " + (end - start) + " ms");
+    }
+
+    private static double getAccuracy(List<double[]> X, List<Integer> y, LogisticRegression model, PredictionService predictionService) {
+        int numCorrect = 0;
+        int numInstances = X.size();
+        for (int i = 0; i < numInstances; i++) {
+            double[] instance = X.get(i);
+            int label = y.get(i);
+
+            int prediction = predictionService.predict(instance, model.getWeights());
+            if (prediction == label) {
+                numCorrect++;
+            }
+        }
+
+        return (double) numCorrect / numInstances;
     }
 
 }

@@ -41,7 +41,6 @@ public class LogisticRegression {
         for (int iteration = 0; iteration < numIterations; iteration++) {
             double[][] gradients = new double[10][numFeatures];
 
-            // FIXME separate instances with batches
             var batches = trainLoader.getBatches();
             for (int batch = 0; batch < batches.size(); ++batch) {
                 var trainImages = batches.get(batch).images();
@@ -53,8 +52,6 @@ public class LogisticRegression {
 
                     double[] probabilities = lossService.calculateProbs(weights, numFeatures, instance);
 
-                    // FIXME add parallel algorithm
-                    // Calculate the gradients
                     for (int j = 0; j < 10; j++) {
                         double gradient = probabilities[j];
                         if (j == label) {
@@ -67,7 +64,6 @@ public class LogisticRegression {
                     }
                 }
 
-                // FIXME can add parallel algorithm
                 for (int i = 0; i < 10; i++) {
                     for (int j = 0; j < numFeatures; j++) {
                         weights[i][j] -= learningRate * gradients[i][j] / numInstances;

@@ -5,11 +5,10 @@ import org.parallel_mnist.entity.DataLoader;
 import org.parallel_mnist.entity.Weights;
 import org.parallel_mnist.service.LossService;
 
-import javax.xml.crypto.Data;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class LogisticRegression {
     private final Weights weights;
@@ -34,73 +33,97 @@ public class LogisticRegression {
     }
 
     public void train(List<double[]> X, List<Integer> y) {
-        var trainLoader = new DataLoader(X, y, 8);
+        var trainLoader = new DataLoader(X, y, 2048);
 
         int numInstances = X.size();
         int numFeatures = X.get(0).length;
 
-//        int numThreads = Thread.activeCount();
-//        ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
-        Thread[] tasks = new Thread[numIterations];
-
         for (int iteration = 0; iteration < numIterations; iteration++) {
-            IterationTask iterationTask = new IterationTask(trainLoader.getBatches(), numFeatures, numInstances);
-            tasks[iteration] = iterationTask;
+
+            var batches = trainLoader.getBatches();
+//            System.out.println("number of batches: " + batches.size());
+
+            ExecutorService executorService = Executors.newFixedThreadPool(15);
+
+            Gradients gradients = new Gradients(numFeatures);
+
+            for (DataLoader.Batch batch : batches) {
+                Runnable batchTask = new BatchTask(batch, gradients, numFeatures);
+                executorService.execute(batchTask);
+            }
+
+            executorService.shutdown();
+
+            while (!executorService.isTerminated()) {
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            weights.update(gradients.getGradients(), learningRate, numInstances);
+        }
+    }
+
+    public class Gradients {
+
+        private final ReentrantLock lock = new ReentrantLock();
+
+        private final int numFeatures;
+        private final double[][] gradients;
+
+        public Gradients(int numFeatures) {
+            this.gradients = new double[10][numFeatures];
+            this.numFeatures = numFeatures;
         }
 
-        for (int iteration = 0; iteration < numIterations; iteration++) {
-            tasks[iteration].start();
-        }
-
-        for (int iteration = 0; iteration < numIterations; iteration++) {
+        public void update(int j, double gradient, double[] instance) {
+            lock.lock();
             try {
-                tasks[iteration].join();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                for (int k = 0; k < numFeatures; k++) {
+                    gradients[j][k] += gradient * instance[k];
+                }
+            } finally {
+                lock.unlock();
             }
         }
 
+        public double[][] getGradients() {
+            return this.gradients;
+        }
     }
 
-    public class IterationTask extends Thread {
+    public class BatchTask extends Thread {
 
-        private final List<DataLoader.Batch> batches;
+        private final double[][] trainImages;
+        private final int[] trainTarget;
+        private final Gradients gradients;
+
         private final int numFeatures;
-        private final int numInstances;
 
-        public IterationTask(List<DataLoader.Batch> batches, int numFeatures, int numInstances) {
-            this.batches = batches;
+        public BatchTask(DataLoader.Batch batch, Gradients gradients, int numFeatures) {
+            this.trainImages = batch.images();
+            this.trainTarget = batch.labels();
+            this.gradients = gradients;
             this.numFeatures = numFeatures;
-            this.numInstances = numInstances;
         }
 
         @Override
         public void run() {
-            double[][] gradients = new double[10][numFeatures];
+            for (int i = 0; i < trainImages.length; i++) {
+                double[] instance = trainImages[i];
+                int label = trainTarget[i];
 
-            for (DataLoader.Batch value : batches) {
-                var trainImages = value.images();
-                var trainTarget = value.labels();
-
-                for (int i = 0; i < trainImages.length; i++) {
-                    double[] instance = trainImages[i];
-                    int label = trainTarget[i];
-
-                    double[] probabilities = lossService.calculateProbs(weights, numFeatures, instance);
-                    for (int j = 0; j < 10; j++) {
-                        double gradient = probabilities[j];
-                        if (j == label) {
-                            gradient -= 1.0;
-                        }
-
-                        for (int k = 0; k < numFeatures; k++) {
-                            gradients[j][k] += gradient * instance[k];
-                        }
+                double[] probabilities = lossService.calculateProbs(weights, numFeatures, instance);
+                for (int j = 0; j < 10; j++) {
+                    double gradient = probabilities[j];
+                    if (j == label) {
+                        gradient -= 1.0;
                     }
+                    gradients.update(j, gradient, instance);
                 }
             }
-            weights.update(gradients, learningRate, numInstances);
         }
-
     }
 }
