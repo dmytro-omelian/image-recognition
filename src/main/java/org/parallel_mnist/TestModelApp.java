@@ -22,7 +22,7 @@ public class TestModelApp {
         var features = train.getFeatures();
         var X = TypeConverterService.convertToArrayOfDoubleArrays(features);
 
-        var testDigit = X[7];
+        var testDigit = X[10];
         ImageVisualizationService visualization = new ImageVisualizationService();
         visualization.visualize(testDigit, 28);
 

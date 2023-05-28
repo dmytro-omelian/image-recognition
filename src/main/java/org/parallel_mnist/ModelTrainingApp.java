@@ -7,7 +7,7 @@ import org.parallel_mnist.service.*;
 import java.util.List;
 
 public class ModelTrainingApp {
-    private static final int NUM_FEATURES = 784; // Number of features in each image
+    private static final int NUM_FEATURES = 784;
     private static final double LEARNING_RATE = 0.01;
     private static final int NUM_EPOCHS = 10;
     private static final int NUM_ITERATIONS = 100;
@@ -23,7 +23,7 @@ public class ModelTrainingApp {
         var labels = train.getLabels();
 
         PreprocessService.TrainTestEntity trainTestEntity = PreprocessService.trainTestSplit(
-                features, labels, 0.2);
+                features, labels, 0.2,true,  42, 15000);
 
         var X_train = trainTestEntity.getTrainX();
         var y_train = trainTestEntity.getTrainY();

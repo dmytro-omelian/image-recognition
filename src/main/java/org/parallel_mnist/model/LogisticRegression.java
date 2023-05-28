@@ -34,7 +34,7 @@ public class LogisticRegression {
     }
 
     public void train(List<double[]> X, List<Integer> y) {
-        var trainLoader = new DataLoader(X, y, 2048);
+        var trainLoader = new DataLoader(X, y, 4096);
 
         int numInstances = X.size();
         int numFeatures = X.get(0).length;

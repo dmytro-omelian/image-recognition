@@ -10,14 +10,17 @@ public class PreprocessService {
     }
 
     public static TrainTestEntity trainTestSplit(List<List<Double>> X, List<Integer> y, double testSize) {
-        return trainTestSplit(X, y, testSize, true, 42);
+        return trainTestSplit(X, y, testSize, true, 42, X.size());
     }
 
-    public static TrainTestEntity trainTestSplit(List<List<Double>> X, List<Integer> y, double testSize, boolean shuffle, int randomState) {
+    public static TrainTestEntity trainTestSplit(List<List<Double>> X, List<Integer> y, double testSize, int randomState) {
+        return trainTestSplit(X, y, testSize, true, randomState, X.size());
+    }
+
+    public static TrainTestEntity trainTestSplit(List<List<Double>> X, List<Integer> y, double testSize, boolean shuffle, int randomState, int n) {
         if (testSize <= 0 || testSize >= 1) {
             throw new IllegalStateException("Test size is not valid...");
         }
-        int n = X.size();
         List<Integer> indexes = new ArrayList<>();
         for (int i = 0; i < n; ++i) {
             indexes.add(i);

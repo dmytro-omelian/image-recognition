@@ -23,7 +23,7 @@ public class ModelTrainingApp {
         var labels = train.getLabels();
 
         PreprocessService.TrainTestEntity trainTestEntity = PreprocessService.trainTestSplit(
-                features, labels, 0.2);
+                features, labels, 0.2, true, 42, 1000);
 
         var X_train = trainTestEntity.getTrainX();
         var y_train = trainTestEntity.getTrainY();

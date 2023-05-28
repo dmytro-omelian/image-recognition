@@ -21,7 +21,6 @@ public class LossService {
 
             double[] probabilities = calculateProbs(weights, numFeatures, instance);
 
-            // Calculate the cross-entropy loss
             double correctProbability = probabilities[label];
             loss += -Math.log(correctProbability);
         }
