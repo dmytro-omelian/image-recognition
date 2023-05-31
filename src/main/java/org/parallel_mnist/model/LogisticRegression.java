@@ -10,6 +10,7 @@ import org.parallel_mnist.service.LossService;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class LogisticRegression {
     private final Weights weights;
@@ -50,12 +51,10 @@ public class LogisticRegression {
             }
 
             executorService.shutdown();
-            while (!executorService.isTerminated()) {
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+            try {
+                executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+            } catch (InterruptedException e) {
+                System.err.println("Error occurred while waiting for executor service, see: " + e);
             }
 
             weights.update(gradients.getGradients(), learningRate, numInstances);
